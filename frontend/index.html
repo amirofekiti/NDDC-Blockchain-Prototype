@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Project Funding DApp</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+</head>
+<body>
+  <h1>Project Funding DApp</h1>
+  <button id="connectButton">Connect Wallet</button>
+  <div id="accountArea"></div>
+  <hr>
+  
+  <h2>Deposit Funds</h2>
+  <input type="text" id="depositAmount" placeholder="Amount in ETH">
+  <button id="depositButton">Deposit</button>
+  <hr>
+  
+  <h2>Disburse Funds</h2>
+  <input type="text" id="recipientAddress" placeholder="Recipient Address">
+  <input type="text" id="disburseAmount" placeholder="Amount in ETH">
+  <button id="disburseButton">Disburse</button>
+  
+  <script>
+    // Declare variables that will be used later
+    let web3;
+    let account;
+    
+    // Replace with your deployed contract address and ABI
+    const contractAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+    const contractABI = [
+      {
+        "inputs": [],
+        "name": "deposit",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address payable",
+            "name": "_recipient",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "_amount",
+            "type": "uint256"
+          }
+        ],
+        "name": "disburse",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "admin",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "index",
+            "type": "uint256"
+          }
+        ],
+        "name": "getTransaction",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "getTransactionCount",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "totalFunds",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "name": "transactions",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "recipient",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      }
+    ];
+
+    // Ensure our code only runs after the page and Web3 have loaded
+    window.addEventListener('load', async () => {
+      // Check if MetaMask is installed
+      if (window.ethereum) {
+        // Initialize web3
+        web3 = new Web3(window.ethereum);
+        console.log("Web3 initialized:", web3);
+        
+        // Connect wallet when button is clicked
+        document.getElementById('connectButton').addEventListener('click', async () => {
+          const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+          account = accounts[0];
+          document.getElementById('accountArea').innerText = 'Connected account: ' + account;
+          console.log("Wallet connected:", account);
+        });
+        
+        // Create the contract instance
+        const contract = new web3.eth.Contract(contractABI, contractAddress);
+        
+        // Deposit funds handler
+        document.getElementById('depositButton').addEventListener('click', async () => {
+          console.log("Deposit button clicked");
+          const amount = document.getElementById('depositAmount').value;
+          console.log("Amount entered:", amount);
+          const weiAmount = web3.utils.toWei(amount, 'ether');
+          console.log("Converted to wei:", weiAmount);
+          try {
+            await contract.methods.deposit().send({ from: account, value: weiAmount });
+            console.log("Deposit transaction successful");
+            alert("Deposit successful!");
+          } catch (error) {
+            console.error("Error during deposit:", error);
+            alert("Deposit failed.");
+          }
+        });
+        
+        // Disburse funds handler
+        document.getElementById('disburseButton').addEventListener('click', async () => {
+          const recipient = document.getElementById('recipientAddress').value;
+          const amount = document.getElementById('disburseAmount').value;
+          const weiAmount = web3.utils.toWei(amount, 'ether');
+          try {
+            await contract.methods.disburse(recipient, weiAmount).send({ from: account });
+            console.log("Disbursement transaction successful");
+            alert("Disbursement successful!");
+          } catch (error) {
+            console.error("Error during disbursement:", error);
+            alert("Disbursement failed.");
+          }
+        });
+      } else {
+        alert("Please install MetaMask!");
+      }
+    });
+  </script>
+</body>
+</html>
