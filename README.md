@@ -1,4 +1,4 @@
-# NDDC Project Fund DAPp
+# NDDC Project Fund DApp
 
 This project demonstrates a basic Hardhat use case. It comes with a contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
 
