@@ -11,4 +11,4 @@ REPORT_GAS=true npx hardhat test
 npx hardhat node
 npx hardhat ignition deploy ./ignition/modules/Lock.js
 ```
-# Update: The project current deployed to the sepolia testnet for educational purposes
+# Update: The project is currently deployed to the sepolia testnet for educational purposes
